@@ -5,14 +5,16 @@ using UnityEngine.UI;
 
 public class GameSettings : MonoBehaviour
 {
+    public static GameSettings instance;
+
     [SerializeField] UI ui;
 
+    public SpawnElements spawnElements;
     public List<GameObject> elements = new List<GameObject>();
     public GameObject grid;
     public Canvas canvas;
     public int speedGame = 2;
 
-    public static GameSettings instance;
 
     #region properties
 

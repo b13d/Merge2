@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class Cell : MonoBehaviour
 {
+    public bool cellOccupied;
+
     private Image _image;
 
     private void Start()

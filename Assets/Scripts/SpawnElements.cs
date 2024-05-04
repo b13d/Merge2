@@ -6,7 +6,6 @@ using UnityEngine;
 public class SpawnElements : MonoBehaviour
 {
     [SerializeField] private List<GameObject> _elements = new List<GameObject>();
-    [SerializeField] private List<int> _occupiedCells = new List<int>();
 
     [SerializeField] private float _seconds = 2f;
     GameObject _grid;
@@ -15,12 +14,6 @@ public class SpawnElements : MonoBehaviour
     void Start()
     {
         _grid = GameSettings.instance.grid;
-
-
-        for (int i = 0; i < _grid.transform.childCount; i++)
-        {
-            _occupiedCells.Add(0);
-        }
     }
 
     
@@ -53,6 +46,9 @@ public class SpawnElements : MonoBehaviour
         newElement.transform.DOLocalMove(new Vector2(0, 0), .5f);
         newElement.GetComponent<SpriteRenderer>().DOFade(0, 0);
         newElement.GetComponent<SpriteRenderer>().DOFade(1, 0.5f);
+
+        clearCell.GetComponent<Cell>().cellOccupied = true;
+
     }
 
     Transform CheckClearCell()
@@ -61,8 +57,9 @@ public class SpawnElements : MonoBehaviour
         
         for (int i = 0; i < _grid.transform.childCount; i++)
         {
-            if (_grid.transform.GetChild(i).childCount == 0)
+            if (!_grid.transform.GetChild(i).GetComponent<Cell>().cellOccupied) // here mb error
             {
+                _grid.transform.GetChild(i).GetComponent<Cell>().cellOccupied = true;
                 newClearTransform = _grid.transform.GetChild(i);
                 break;
             }

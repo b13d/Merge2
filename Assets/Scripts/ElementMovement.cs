@@ -7,13 +7,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ElementMovement : MonoBehaviour,  IBeginDragHandler, IEndDragHandler, IDragHandler
+public class ElementMovement : MonoBehaviour,IPointerUpHandler, IPointerDownHandler, IBeginDragHandler, IDragHandler
 {
     [SerializeField] Transform _oldParent;
     [SerializeField] Transform _newParent;
+    [SerializeField] List<int> _cells;
 
     public int level;
-
 
     private void Start()
     {
@@ -25,12 +25,12 @@ public class ElementMovement : MonoBehaviour,  IBeginDragHandler, IEndDragHandle
     {
         if (col.tag == "Cell")
         {
-            if (col.transform.childCount == 0)
+            if (!col.GetComponent<Cell>().cellOccupied)
             {
                 _newParent = col.transform;
-            } else if (col.transform.childCount == 1)
+            } else if (col.GetComponent<Cell>().cellOccupied)
             {
-                if (col.transform.GetChild(0).tag == "Element")
+                if (col.transform.childCount > 0 && col.transform.GetChild(0).tag == "Element")
                 {
                     if (col.transform.GetChild(0).GetComponent<ElementMovement>().level == level)
                     {
@@ -38,6 +38,8 @@ public class ElementMovement : MonoBehaviour,  IBeginDragHandler, IEndDragHandle
                     } else
                     {
                         // Change
+                        
+
                     }
                 }
             }
@@ -105,15 +107,36 @@ public class ElementMovement : MonoBehaviour,  IBeginDragHandler, IEndDragHandle
        
     }
 
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        transform.DOKill();
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (_newParent == null)
+        {
+            // Если активный элемент, не выбрал пустую, или иную ячейку
+            // то он возвращается обратно
+
+            transform.parent = _oldParent;
+            transform.DOLocalMove(Vector2.zero, 1f);
+        }
+        else
+        {
+            transform.parent = _newParent;
+
+            _oldParent.GetComponent<Cell>().cellOccupied = false;
+            _newParent.GetComponent<Cell>().cellOccupied = true;
+
+            transform.DOLocalMove(Vector2.zero, 1f);
+        }
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         _oldParent = transform.parent;
         transform.parent = GameSettings.instance.canvas.transform;
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-       
     }
 
     public void OnDrag(PointerEventData eventData)
